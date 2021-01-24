@@ -2,6 +2,12 @@
 
 experiments for visualizing elixir applications
 
+### Run
+
+```bash
+mix run scripts/tree_tracer.exs
+```
+
 
 ## Installation
 
