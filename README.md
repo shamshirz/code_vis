@@ -5,9 +5,18 @@ experiments for visualizing elixir applications
 ### Run
 
 ```bash
-mix run scripts/tree_tracer.exs
+> mix run scripts/tree_tracer.exs
+
+CodeVis.i_alias/0 ->
+--CodeVis.ModuleC.fxn/0 -> leaf
+--CodeVis.ModuleB.fxn/0 ->
+----CodeVis.ModuleA.fxn/0 -> leaf
 ```
 
+## Next steps
+* Try out `digraph`
+  * or an equivalent tool `https://github.com/mikowitz/graphvix`
+* This basic version should be okay enough to try on a larger code base
 
 ## Installation
 
