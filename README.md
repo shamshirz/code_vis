@@ -1,6 +1,7 @@
 # CodeVis
 
-**TODO: Add description**
+experiments for visualizing elixir applications
+
 
 ## Installation
 
