@@ -12,6 +12,13 @@ CodeVis.i_alias/0 ->
 --CodeVis.ModuleB.fxn/0 ->
 ----CodeVis.ModuleA.fxn/0 -> leaf
 ```
+<!-- 1/256 -->
+Got basic graphvix working - not correct graph, but compiles and executes
+
+<!-- 1/25 -->
+Tried graphvix
+`brew install graphviz`
+then worked
 
 ## Next steps
 * Try out `digraph`
