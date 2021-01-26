@@ -13,8 +13,6 @@ defmodule TreeTracer do
     ]
 
   Ideally at the end we can recursively build a tree from a top level function of all the dependants
-
-
   """
 
   def run() do
@@ -31,11 +29,11 @@ defmodule TreeTracer do
 
     # callees = get_callees(root)
 
-    IO.puts("Results for: #{format_mfa(root)}\n")
-    # IO.puts("#{format_mfa(root)} -> #{format_ets_result(callees)}")
-    IO.inspect(map)
-
-    IO.puts(print_map(map, root))
+    IO.puts("Results for: #{Display.format_mfa(root)}\n")
+    # IO.puts("#{Display.format_mfa(root)} -> #{format_ets_result(callees)}")
+    # IO.inspect(map)
+    Display.as_io(map, root)
+    Display.as_file(map, root)
   end
 
   @type remote_call_result :: {mfa(), list()}
@@ -86,28 +84,6 @@ defmodule TreeTracer do
     end
   end
 
-  @spec print_map(map(), mfa(), integer()) :: String.t()
-  def print_map(map, mfa, level \\ 0) do
-    case Map.fetch!(map, mfa) do
-      [] ->
-        "#{indent(level)}#{format_mfa(mfa)} -> leaf"
-
-      other_calls ->
-        sub_lines =
-          other_calls
-          |> Enum.map(fn next -> print_map(map, next, level + 2) end)
-          |> Enum.join("\n")
-
-        """
-        #{indent(level)}#{format_mfa(mfa)} ->
-        #{sub_lines}
-        """
-    end
-  end
-
-  @spec indent(integer()) :: String.t()
-  defp indent(level), do: String.duplicate("-", level)
-
   # skip built ins (TODO: Make this dynamic so it's not trial and error)
   @spec trace(tuple, Macro.Env.t()) :: :ok
   def trace({:remote_function, _meta, module, _name, _arity}, _env)
@@ -127,25 +103,13 @@ defmodule TreeTracer do
       caller = {env.module, caller_name, caller_arity}
       target = {module, name, arity}
       :ets.insert(:functions, {caller, target})
-      # IO.puts("#{format_mfa(caller)} -> #{format_mfa(target)}")
+      # IO.puts("#{Display.format_mfa(caller)} -> #{Display.format_mfa(target)}")
     end
 
     :ok
   end
 
   def trace(_, _), do: :ok
-
-  @spec format_mfa(mfa()) :: String.t()
-  defp format_mfa({module, function_name, arity}) do
-    "#{inspect(module)}.#{function_name}/#{arity}"
-  end
-
-  @spec format_ets_result([{mfa(), mfa()}] | {mfa(), mfa()} | mfa()) :: String.t()
-  defp format_ets_result({_m, _f, _a} = mfa), do: format_mfa(mfa)
-  defp format_ets_result({_key, value}), do: format_mfa(value)
-
-  defp format_ets_result(results) when is_list(results),
-    do: results |> Enum.map(&format_ets_result/1) |> Enum.join(", ")
 end
 
 TreeTracer.run()
