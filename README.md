@@ -12,11 +12,20 @@ CodeVis.i_alias/0 ->
 --CodeVis.ModuleB.fxn/0 ->
 ----CodeVis.ModuleA.fxn/0 -> leaf
 ```
+<!-- 1/256 -->
+Got basic graphvix working - not correct graph, but compiles and executes
+
+<!-- 1/25 -->
+Tried graphvix
+`brew install graphviz`
+then worked
 
 ## Next steps
-* Try out `digraph`
-  * or an equivalent tool `https://github.com/mikowitz/graphvix`
-* This basic version should be okay enough to try on a larger code base
+* ✅ Try out `https://github.com/mikowitz/graphvix`
+  * `brew install graphviz` (for `dot` cmd line util)
+* ✅ Try on larger code base
+* Capture local function calls as well
+* Filter out calls to non-user modules
 
 ## Installation
 

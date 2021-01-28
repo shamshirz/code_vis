@@ -1,6 +1,7 @@
 /_build
+/config/*.secret.exs
+/_graphs
 /deps
 *.beam
-/config/*.secret.exs
 .elixir_ls/
-
+.DS_Store
