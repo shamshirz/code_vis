@@ -1,36 +1,12 @@
 defmodule Display.GraphIt do
+  @moduledoc """
+  Wrapper around graphing dependency
+  Convert `CodeVis` representation of data into a visual graph
+
+  Internal to this module, this uses `%Graphvix.Graph{}` to transform the data and then display it
+  """
+
   alias Graphvix.Graph
-
-  def example(_map, _root, file_name \\ "_graphs/first_graph") do
-    graph = Graph.new()
-
-    # vertex
-    {graph1, vertex_id1} = Graph.add_vertex(graph, "vertex label")
-    {graph2, vertex_id2} = Graph.add_vertex(graph1, "vertex label")
-    {graph3, vertex_id3} = Graph.add_vertex(graph2, "vertex label")
-
-    # edge
-    {graph4, _edge_id} =
-      Graph.add_edge(
-        graph3,
-        vertex_id1,
-        vertex_id2,
-        label: "Edge",
-        color: "green"
-      )
-
-    {graph5, _edge_id} =
-      Graph.add_edge(
-        graph4,
-        vertex_id1,
-        vertex_id3,
-        label: "Edge",
-        color: "green"
-      )
-
-    # produce graph and open
-    Graph.compile(graph5, file_name)
-  end
 
   @doc """
   Given a function, find all outgoing calls.
@@ -47,14 +23,13 @@ defmodule Display.GraphIt do
 
   First pass - make everything in the printed version as node, no edges
   """
-  @spec create(map(), mfa(), binary) :: :ok
-  def create(map, mfaroot, file_name \\ "_graphs/first_graph") do
-    graph = add_node(map, mfaroot, nil, Graph.new())
+  @spec new(map(), mfa()) :: Graphvix.Graph.t()
+  def new(map, mfaroot), do: add_node(map, mfaroot, nil, Graph.new())
 
-    Graph.compile(graph, file_name)
-  end
+  @spec to_file(Graphvix.Graph.t(), String.t()) :: :ok
+  def to_file(graph, file_name \\ "_graphs/first_graph"), do: Graph.compile(graph, file_name)
 
-  @spec add_node(map(), mfa(), edge_id :: any(), graph :: any()) :: graph :: any()
+  @spec add_node(map(), mfa(), edge_id :: any(), Graphvix.Graph.t()) :: Graphvix.Graph.t()
   defp add_node(map, mfa, parent_vertex_id, graph) do
     {updated_graph, current_vertex_id} = add_node_and_edge_to_parent(graph, mfa, parent_vertex_id)
 
@@ -72,8 +47,8 @@ defmodule Display.GraphIt do
     end
   end
 
-  @spec add_node_and_edge_to_parent(any(), mfa(), nil | any()) ::
-          {graph :: any(), vertex_id :: any()}
+  @spec add_node_and_edge_to_parent(Graphvix.Graph.t(), mfa(), nil | any()) ::
+          {Graphvix.Graph.t(), vertex_id :: any()}
   defp add_node_and_edge_to_parent(graph, mfa, nil) do
     Graph.add_vertex(graph, Display.format_mfa(mfa))
   end

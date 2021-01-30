@@ -3,7 +3,9 @@ defmodule Display do
 
   @spec as_file(map(), mfa()) :: :ok
   def as_file(map, root_mfa) do
-    GraphIt.create(map, root_mfa)
+    map
+    |> GraphIt.new(root_mfa)
+    |> GraphIt.to_file()
   end
 
   @spec as_io(map(), mfa()) :: :ok
