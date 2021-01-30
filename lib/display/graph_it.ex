@@ -35,17 +35,33 @@ defmodule Display.GraphIt do
 
     case Map.fetch!(map, mfa) do
       [] ->
-        # Leaf, create node (eventual draw edge to parent, done)
-        # "#{indent(level)}#{format_mfa(mfa)} -> leaf"
+        # Leaf, do nothing
         updated_graph
 
       target_mfas ->
         # Branch, gather children
-        Enum.reduce(target_mfas, updated_graph, fn target_mfa, acc ->
+        target_mfas
+        |> Enum.flat_map(fn target -> traverse_local_functions(map, target, mfa) end)
+        |> Enum.reduce(updated_graph, fn target_mfa, acc ->
           add_node(map, target_mfa, current_vertex_id, acc)
         end)
     end
   end
+
+  # if the target is in the same module, traverse it's calls
+  # recursively traverse local functions, returning only remote calls
+  @spec traverse_local_functions(map, mfa(), mfa()) :: [mfa()]
+  defp traverse_local_functions(
+         map,
+         {same_module, _, _} = target_mfa,
+         {same_module, _, _} = current_mfa
+       ) do
+    map
+    |> Map.fetch!(target_mfa)
+    |> Enum.flat_map(fn target -> traverse_local_functions(map, target, current_mfa) end)
+  end
+
+  defp traverse_local_functions(_map, target_mfa, _current_mfa), do: [target_mfa]
 
   @spec add_node_and_edge_to_parent(Graphvix.Graph.t(), mfa(), nil | any()) ::
           {Graphvix.Graph.t(), vertex_id :: any()}

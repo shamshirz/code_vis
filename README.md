@@ -7,16 +7,22 @@ Compile-time tool to visualize elixir applications flow.
 ```bash
 # External dep on `dot` cmd line util
 > brew install graphviz
-> mix deps.get
-> mix run scripts/tree_tracer.exs
+> mix deps.get && mix compile
+# this alias simplifies a big step
+# Go to an example project, use `CodeVis` as a dep, and run the visualize task
+> mix try
 
-CodeVis.i_alias/0 ->
---CodeVis.ModuleA.fxn/0 -> leaf
---CodeVis.ModuleB.fxn/0 ->
-----CodeVis.ModuleA.fxn/0 -> leaf
---CodeVis.ModuleC.fxn/0 -> leaf
+TestProject.i_alias/0 ->
+--TestProject.ModuleA.fxn/0 -> leaf
+--TestProject.ModuleB.fxn/0 ->
+----TestProject.ModuleA.fxn/0 -> leaf
 
-> open _graphs/first_graph.png
+--TestProject.ModuleC.fxn/0 ->
+----TestProject.ModuleC.local_leaf/0 -> leaf
+
+--TestProject.ModuleD.fxn/0 ->
+----TestProject.ModuleD.local_remote/0 ->
+------TestProject.ModuleA.fxn/0 -> leaf
 
 ```
 
@@ -32,6 +38,8 @@ CodeVis.i_alias/0 ->
   * main logic functions
     * build map from ETS
     * Build Graph from Map
+  * This turned out to be really hard! How do we test a mix task that recompiles the project?
+    * [Boundary](https://github.com/sasa1977/boundary/blob/master/test/support/test_project.ex) does it by generating a dynamic project within the test setup!!
 * (Quality) Struct for each node with available info
 * (Decision) How to display circular deps? new node or re-use?
   * Currently, adds a new node, not the end of the world
@@ -41,20 +49,25 @@ CodeVis.i_alias/0 ->
   * Useful once this is running on other projects
 * (minor) Edges could be labelled with the line number in the caller's module
 
+
+## Resources
+
+* [Dashbit tracer example](https://gist.github.com/wojtekmach/4e04cbda82ba88af3f84c44ec746b7ca#file-import2alias-ex-L20)
+
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `code_vis` to your list of dependencies in `mix.exs`:
+Try it out on your project!
 
 ```elixir
 def deps do
   [
-    {:code_vis, "~> 0.1.0"}
+    ## {:code_vis, "~> 0.1.0"}
+    {:code_vis, git: "https://github.com/shamshirz/code_vis.git", tag: "0.1"}
   ]
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/code_vis](https://hexdocs.pm/code_vis).
-
+```bash
+> mix deps.get
+> mix visualize <Input of some kind to identify which function to trace>
+```
