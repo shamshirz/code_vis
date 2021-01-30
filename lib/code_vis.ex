@@ -1,23 +1,24 @@
 defmodule CodeVis do
   @moduledoc """
-  Documentation for `CodeVis`.
+  Top level example module
+  This is basically a test and should probably live in /test
+  There is no real code here, just an example structure to validate against
   """
-
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> CodeVis.hello()
-      :world
-
-  """
-  def hello do
-    :world
+  def i_alias do
+    CodeVis.ModuleA.fxn()
+    CodeVis.ModuleB.fxn()
+    CodeVis.ModuleC.fxn()
   end
 
-  def i_alias do
-    CodeVis.ModuleC.fxn()
-    CodeVis.ModuleB.fxn()
+  defmodule ModuleA do
+    def fxn, do: 4
+  end
+
+  defmodule ModuleB do
+    def fxn, do: CodeVis.ModuleA.fxn()
+  end
+
+  defmodule ModuleC do
+    def fxn, do: 4
   end
 end
