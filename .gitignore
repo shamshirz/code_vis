@@ -5,3 +5,7 @@
 *.beam
 .elixir_ls/
 .DS_Store
+test_project/_build
+test_project/_graphs
+test_project/deps
+test_project/*.beam
