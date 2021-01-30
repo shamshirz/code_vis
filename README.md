@@ -8,18 +8,21 @@ Compile-time tool to visualize elixir applications flow.
 # External dep on `dot` cmd line util
 > brew install graphviz
 > mix deps.get && mix compile
-# Enter example project to execute task there
-> cd test_project
-> mix deps.get
-> mix visualize
+# this alias simplifies a big step
+# Go to an example project, use `CodeVis` as a dep, and run the visualize task
+> mix try
 
 TestProject.i_alias/0 ->
 --TestProject.ModuleA.fxn/0 -> leaf
 --TestProject.ModuleB.fxn/0 ->
 ----TestProject.ModuleA.fxn/0 -> leaf
---TestProject.ModuleC.fxn/0 -> leaf
 
-> open _graphs/first_graph.png
+--TestProject.ModuleC.fxn/0 ->
+----TestProject.ModuleC.local_leaf/0 -> leaf
+
+--TestProject.ModuleD.fxn/0 ->
+----TestProject.ModuleD.local_remote/0 ->
+------TestProject.ModuleA.fxn/0 -> leaf
 
 ```
 
