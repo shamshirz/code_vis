@@ -23,6 +23,7 @@ defmodule TreeTracer do
     IO.puts("Trace complete. Building Tree…")
 
     root = {CodeVis, :i_alias, 0}
+    # root = {Display, :as_file, 2}
 
     # tree = build_tree(root)
     map = build_map(root)
@@ -34,28 +35,6 @@ defmodule TreeTracer do
     # IO.inspect(map)
     Display.as_io(map, root)
     Display.as_file(map, root)
-  end
-
-  @type remote_call_result :: {mfa(), list()}
-
-  @doc """
-  Each MFA will return a list of remote MFAs called
-  [ {mfa_a, [
-      {mfa_b, []},
-      {mfa_c, [ {mfa_d, []} ] }
-    }
-  ]
-  """
-  @spec build_tree(mfa()) :: [remote_call_result()]
-  def build_tree(current_mfa) do
-    case get_remote_calls(current_mfa) do
-      [] ->
-        # base case
-        [{current_mfa, []}]
-
-      remote_mfas ->
-        [{current_mfa, Enum.map(remote_mfas, fn target -> {target, build_tree(target)} end)}]
-    end
   end
 
   @spec get_remote_calls(mfa()) :: [mfa()]
@@ -84,6 +63,11 @@ defmodule TreeTracer do
     end
   end
 
+  # 1. Add more context to what's happening in trace/2
+  # 2. What about a Module white list rather than black list?
+  #   use Tracer modules: [CodeVis, Display]
+  #   vs.
+  #   Tracer (hardcoded ignore modules, there will be more and I won't be able to catch them)
   # skip built ins (TODO: Make this dynamic so it's not trial and error)
   @spec trace(tuple, Macro.Env.t()) :: :ok
   def trace({:remote_function, _meta, module, _name, _arity}, _env)
@@ -99,6 +83,8 @@ defmodule TreeTracer do
   def trace({:remote_function, _meta, module, name, arity}, env) do
     # IO.inspect(env.module)
     # env.line
+    # IO.inspect(env.file, label: "module:#{module}")
+
     with {caller_name, caller_arity} <- env.function do
       caller = {env.module, caller_name, caller_arity}
       target = {module, name, arity}
