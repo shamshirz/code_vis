@@ -13,10 +13,7 @@ defmodule Mix.Tasks.Visualize do
       Mix.raise("Elixir v1.10+ is required!")
     end
 
-    # Mix.Task.run("app.start")
     :ets.new(:functions, [:named_table, :public, :duplicate_bag])
-    # Mix.Task.clear()
-    IO.inspect(Application.load(:code_vis))
     Mix.Task.rerun("compile.elixir", ["--force", "--tracer", "CodeVis.FunctionTracer"])
 
     IO.puts("Trace complete. Building Tree…")
