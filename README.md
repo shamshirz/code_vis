@@ -27,17 +27,16 @@ TestProject.i_alias/0 ->
 ```
 
 ## Next steps
-* (Essential Feature) Capture local function calls as well
-  * Without this, we are missing outgoing calls
-  * Don't want to show local calls in the graph, not essential
-* (Quality) Add tests
-  * 3 steps to data: collect -> Intermediate form (map rn) -> Graph
-  * Testing tracer seems hard
-  * Testing intermediate would probs be really useful - need to decide on a form
-  * testing the graph should be easy, but also least important
-  * main logic functions
-    * build map from ETS
-    * Build Graph from Map
+* ✅ Capture local function calls as well
+  * Hide local functions from graph
+* ✅ Make it easy to run on other repositories
+  * ✅ allow `mix visualize` to accept an arg for root function
+  * Test on another repo!
+* Add tests
+  * ✅ Easier manual test of full `mix visualize`
+  * Test compilation tracer
+  * Test Graphing independently
+  * Test `:ets` to `Map` fxn
   * This turned out to be really hard! How do we test a mix task that recompiles the project?
     * [Boundary](https://github.com/sasa1977/boundary/blob/master/test/support/test_project.ex) does it by generating a dynamic project within the test setup!!
 * (Quality) Struct for each node with available info
@@ -48,6 +47,7 @@ TestProject.i_alias/0 ->
   * manifest file -> Elixir compiler fxn to read -> pulls out module list
   * Useful once this is running on other projects
 * (minor) Edges could be labelled with the line number in the caller's module
+  * Needs to collect more data - struct step
 
 
 ## Resources
@@ -61,7 +61,6 @@ Try it out on your project!
 ```elixir
 def deps do
   [
-    ## {:code_vis, "~> 0.1.0"}
     {:code_vis, git: "https://github.com/shamshirz/code_vis.git", tag: "0.1"}
   ]
 end
@@ -69,5 +68,5 @@ end
 
 ```bash
 > mix deps.get
-> mix visualize <Input of some kind to identify which function to trace>
+> mix visualize YourModule.and_function/arity
 ```
