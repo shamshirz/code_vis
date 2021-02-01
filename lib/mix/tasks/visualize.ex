@@ -1,6 +1,16 @@
 defmodule Mix.Tasks.Visualize do
   @moduledoc """
   Trace compiled functions and display a tree of called functions for a given root
+
+  ## Visualize args
+
+  The visualize task expects a module, function, arity string:
+
+    mix visualize Module.function/#
+
+  ## Example
+
+    mix visualize Display.as_file/2
   """
   @shortdoc "Displays function dependencies"
   @requirements ["app.config"]
@@ -8,7 +18,7 @@ defmodule Mix.Tasks.Visualize do
   use Mix.Task
 
   @impl true
-  def run(_) do
+  def run(args) do
     unless Version.match?(System.version(), ">= 1.10.0-rc") do
       Mix.raise("Elixir v1.10+ is required!")
     end
@@ -18,19 +28,40 @@ defmodule Mix.Tasks.Visualize do
 
     IO.puts("Trace complete. Building Tree…")
 
-    # root = {CodeVis, :i_alias, 0}
-    root = {TestProject, :i_alias, 0}
+    root = parse_root(args)
 
-    # tree = build_tree(root)
     map = build_map(root)
 
-    # callees = get_callees(root)
-
     IO.puts("Results for: #{Display.format_mfa(root)}\n")
-    # IO.puts("#{Display.format_mfa(root)} -> #{format_ets_result(callees)}")
-    # IO.inspect(map)
     Display.as_io(map, root)
     Display.as_file(map, root)
+  end
+
+  # Parse the input mfa_string if available.
+  # Given no arg, attempts to default to the first function in the table - not a great display
+  @spec parse_root([String.t()]) :: mfa()
+  defp parse_root(args) do
+    case args do
+      [] ->
+        case :ets.first(:functions) do
+          :"$end_of_table" ->
+            Mix.raise("no functions were found during compilation trace")
+
+          key ->
+            IO.puts("We didn't find a passed in MFA, so we default to a random function: #{key}")
+
+            key
+        end
+
+      [mfa_string] ->
+        case Mix.Utils.parse_mfa(mfa_string) do
+          {:ok, [m, f, a]} ->
+            {m, f, a}
+
+          _ ->
+            Mix.raise("I wasn't able to parse `#{mfa_string}` into a {Module, Function, Arity}")
+        end
+    end
   end
 
   # defp run(module, alias) do
