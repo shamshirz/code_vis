@@ -77,7 +77,7 @@ defmodule Display.GraphIt do
         updated_graph,
         parent_vertex_id,
         current_vertex_id,
-        label: "fxn_name",
+        # label: "fxn_name",
         color: "green"
       )
 
