@@ -60,7 +60,7 @@ defmodule CodeVis.FunctionTracer do
     with {caller_name, caller_arity} <- env.function do
       caller = {env.module, caller_name, caller_arity}
       target = {env.module, name, arity}
-      IO.puts("LOCAL: #{Display.format_mfa(caller)} -> #{Display.format_mfa(target)}")
+      # IO.puts("LOCAL: #{Display.format_mfa(caller)} -> #{Display.format_mfa(target)}")
       :ets.insert(:functions, {caller, target})
     end
 

@@ -31,7 +31,7 @@ TestProject.i_alias/0 ->
   * Hide local functions from graph
 * ✅ Make it easy to run on other repositories
   * ✅ allow `mix visualize` to accept an arg for root function
-  * Test on another repo!
+  * ✅ Test on another repo! -> Needs to ignore non user modules
 * Add tests
   * ✅ Easier manual test of full `mix visualize`
   * Test compilation tracer
@@ -39,13 +39,13 @@ TestProject.i_alias/0 ->
   * Test `:ets` to `Map` fxn
   * This turned out to be really hard! How do we test a mix task that recompiles the project?
     * [Boundary](https://github.com/sasa1977/boundary/blob/master/test/support/test_project.ex) does it by generating a dynamic project within the test setup!!
+* ✅ Filter non-user code
+  * ✅ Don't want to display `Enum` calls, etc. `CodeVis.ProjectAnalysis`
+  * ✅ Test gathering user modules
+  * Test filtering out of non-user modules
 * (Quality) Struct for each node with available info
 * (Decision) How to display circular deps? new node or re-use?
   * Currently, adds a new node, not the end of the world
-* (Improvement) How to filter non-user code? Don't want to display `Enum` calls
-  * This is how [Mix.Xref.calls/1](https://github.com/elixir-lang/elixir/blob/v1.11.3/lib/mix/lib/mix/tasks/xref.ex#L235) did it until they deprecated it
-  * manifest file -> Elixir compiler fxn to read -> pulls out module list
-  * Useful once this is running on other projects
 * (minor) Edges could be labelled with the line number in the caller's module
   * Needs to collect more data - struct step
 

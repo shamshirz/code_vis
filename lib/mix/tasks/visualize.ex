@@ -29,8 +29,9 @@ defmodule Mix.Tasks.Visualize do
     IO.puts("Trace complete. Building Tree…")
 
     root = parse_root(args)
+    user_modules = CodeVis.ProjectAnalysis.user_modules() |> IO.inspect(label: "mods")
 
-    map = build_map(root)
+    map = build_map(root, user_modules)
 
     IO.puts("Results for: #{Display.format_mfa(root)}\n")
     Display.as_io(map, root)
@@ -82,10 +83,12 @@ defmodule Mix.Tasks.Visualize do
   # This should live elsewhere
   @doc """
   Create a flat map and recurse over it (basically just like in the ets table)
+  Adjacency matrix
+  Includes only functions that are within user defined modules
   """
-  @spec build_map(map(), mfa()) :: map()
-  def build_map(accumulator \\ %{}, current_mfa) do
-    case get_remote_calls(current_mfa) do
+  @spec build_map(map(), mfa(), [module()]) :: map()
+  def build_map(accumulator \\ %{}, current_mfa, user_modules) do
+    case get_remote_calls(current_mfa) |> Enum.filter(fn {m, _f, _a} -> m in user_modules end) do
       [] ->
         # base case
         Map.put(accumulator, current_mfa, [])
@@ -94,7 +97,7 @@ defmodule Mix.Tasks.Visualize do
         updated = Map.put(accumulator, current_mfa, remote_mfas)
 
         Enum.reduce(remote_mfas, updated, fn next_mfa, acc ->
-          build_map(acc, next_mfa)
+          build_map(acc, next_mfa, user_modules)
         end)
     end
   end

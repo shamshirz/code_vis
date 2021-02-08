@@ -7,7 +7,8 @@ defmodule TestProject do
   end
 
   defmodule ModuleA do
-    def fxn, do: 4
+    def fxn, do: local_non_user_remote()
+    defp local_non_user_remote, do: [3] |> Enum.map(fn num -> num + 1 end)
   end
 
   defmodule ModuleB do
