@@ -17,13 +17,15 @@ defmodule Mix.Tasks.Visualize do
 
   use Mix.Task
 
+  alias CodeVis.Repo
+
   @impl true
   def run(args) do
     unless Version.match?(System.version(), ">= 1.10.0-rc") do
       Mix.raise("Elixir v1.10+ is required!")
     end
 
-    :ets.new(:functions, [:named_table, :public, :duplicate_bag])
+    Repo.start()
     Mix.Task.rerun("compile.elixir", ["--force", "--tracer", "CodeVis.FunctionTracer"])
 
     IO.puts("Trace complete. Building Tree…")
@@ -44,13 +46,12 @@ defmodule Mix.Tasks.Visualize do
   defp parse_root(args) do
     case args do
       [] ->
-        case :ets.first(:functions) do
-          :"$end_of_table" ->
+        case  Repo.first() do
+          :error ->
             Mix.raise("no functions were found during compilation trace")
 
           key ->
             IO.puts("We didn't find a passed in MFA, so we default to a random function: #{key}")
-
             key
         end
 
@@ -73,22 +74,17 @@ defmodule Mix.Tasks.Visualize do
   #   Import2Alias.import2alias(alias, entries)
   # end
 
-  @spec get_remote_calls(mfa()) :: [mfa()]
-  def get_remote_calls(mfa) do
-    :functions
-    |> :ets.lookup(mfa)
-    |> Enum.map(&elem(&1, 1))
-  end
-
   # This should live elsewhere
   @doc """
   Create a flat map and recurse over it (basically just like in the ets table)
   Adjacency matrix
   Includes only functions that are within user defined modules
+  Key: MFA for every function that is compiled starting from the root_mfa
+  Values: MFA for each function called directly by the key MFA
   """
   @spec build_map(map(), mfa(), [module()]) :: map()
   def build_map(accumulator \\ %{}, current_mfa, user_modules) do
-    case get_remote_calls(current_mfa) |> Enum.filter(fn {m, _f, _a} -> m in user_modules end) do
+    case Repo.lookup(current_mfa) |> Enum.filter(fn {m, _f, _a} -> m in user_modules end) do
       [] ->
         # base case
         Map.put(accumulator, current_mfa, [])
