@@ -48,18 +48,20 @@ defmodule Display.GraphIt do
     end
   end
 
+  # Uncomment to enable collapsing local functions into a single node
+  # ==========================================
   # if the target is in the same module, traverse it's calls
   # recursively traverse local functions, returning only remote calls
-  @spec traverse_local_functions(map, mfa(), mfa()) :: [mfa()]
-  defp traverse_local_functions(
-         map,
-         {same_module, _, _} = target_mfa,
-         {same_module, _, _} = current_mfa
-       ) do
-    map
-    |> Map.fetch!(target_mfa)
-    |> Enum.flat_map(fn target -> traverse_local_functions(map, target, current_mfa) end)
-  end
+  # @spec traverse_local_functions(map, mfa(), mfa()) :: [mfa()]
+  # defp traverse_local_functions(
+  #        map,
+  #        {same_module, _, _} = target_mfa,
+  #        {same_module, _, _} = current_mfa
+  #      ) do
+  #   map
+  #   |> Map.fetch!(target_mfa)
+  #   |> Enum.flat_map(fn target -> traverse_local_functions(map, target, current_mfa) end)
+  # end
 
   defp traverse_local_functions(_map, target_mfa, _current_mfa), do: [target_mfa]
 
