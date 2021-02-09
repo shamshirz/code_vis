@@ -18,6 +18,8 @@ defmodule CodeVis.FunctionTracer do
   ETS table `:functions` with an entry for every Function called and a list of all of the functions called from within that function
   """
 
+  alias CodeVis.Repo
+
   # def trace({:imported_function, meta, module, name, arity}, env) do
   #   Import2Alias.Server.record(env.file, meta[:line], meta[:column], module, name, arity)
   #   :ok
@@ -48,7 +50,7 @@ defmodule CodeVis.FunctionTracer do
     with {caller_name, caller_arity} <- env.function do
       caller = {env.module, caller_name, caller_arity}
       target = {module, name, arity}
-      :ets.insert(:functions, {caller, target})
+      Repo.insert({caller, target})
       # IO.puts("#{Display.format_mfa(caller)} -> #{Display.format_mfa(target)}")
     end
 
@@ -61,7 +63,7 @@ defmodule CodeVis.FunctionTracer do
       caller = {env.module, caller_name, caller_arity}
       target = {env.module, name, arity}
       # IO.puts("LOCAL: #{Display.format_mfa(caller)} -> #{Display.format_mfa(target)}")
-      :ets.insert(:functions, {caller, target})
+      Repo.insert({caller, target})
     end
 
     :ok
