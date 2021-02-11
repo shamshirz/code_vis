@@ -23,15 +23,24 @@ defmodule Display.GraphIt do
 
   First pass - make everything in the printed version as node, no edges
   """
-  @spec new(map(), mfa()) :: Graphvix.Graph.t()
-  def new(map, mfaroot), do: add_node(map, mfaroot, nil, Graph.new())
+  @spec new(CodeVis.adjacency_map(), mfa(), CodeVis.module_stats()) :: Graphvix.Graph.t()
+  def new(map, mfaroot, module_stats), do: add_node(map, module_stats, mfaroot, nil, Graph.new())
 
   @spec to_file(Graphvix.Graph.t(), String.t()) :: :ok
   def to_file(graph, file_name \\ "_graphs/first_graph"), do: Graph.compile(graph, file_name)
 
-  @spec add_node(map(), mfa(), edge_id :: any(), Graphvix.Graph.t()) :: Graphvix.Graph.t()
-  defp add_node(map, mfa, parent_vertex_id, graph) do
-    {updated_graph, current_vertex_id} = add_node_and_edge_to_parent(graph, mfa, parent_vertex_id)
+  @spec add_node(
+          CodeVis.adjacency_map(),
+          CodeVis.module_stats(),
+          mfa(),
+          edge_id :: any(),
+          Graphvix.Graph.t()
+        ) :: Graphvix.Graph.t()
+  defp add_node(map, module_stats, mfa, parent_vertex_id, graph) do
+    %{color: color} = Map.get(module_stats, elem(mfa, 0), %{color: "grey"})
+
+    {updated_graph, current_vertex_id} =
+      add_node_and_edge_to_parent(graph, mfa, color, parent_vertex_id)
 
     case Map.fetch!(map, mfa) do
       [] ->
@@ -43,7 +52,7 @@ defmodule Display.GraphIt do
         target_mfas
         |> Enum.flat_map(fn target -> traverse_local_functions(map, target, mfa) end)
         |> Enum.reduce(updated_graph, fn target_mfa, acc ->
-          add_node(map, target_mfa, current_vertex_id, acc)
+          add_node(map, module_stats, target_mfa, current_vertex_id, acc)
         end)
     end
   end
@@ -65,22 +74,23 @@ defmodule Display.GraphIt do
 
   defp traverse_local_functions(_map, target_mfa, _current_mfa), do: [target_mfa]
 
-  @spec add_node_and_edge_to_parent(Graphvix.Graph.t(), mfa(), nil | any()) ::
+  @spec add_node_and_edge_to_parent(Graphvix.Graph.t(), mfa(), color :: String.t(), nil | any()) ::
           {Graphvix.Graph.t(), vertex_id :: any()}
-  defp add_node_and_edge_to_parent(graph, mfa, nil) do
-    Graph.add_vertex(graph, Display.format_mfa(mfa))
+  defp add_node_and_edge_to_parent(graph, mfa, color, nil) do
+    Graph.add_vertex(graph, Display.format_mfa(mfa), color: color)
   end
 
-  defp add_node_and_edge_to_parent(graph, mfa, parent_vertex_id) do
-    {updated_graph, current_vertex_id} = Graph.add_vertex(graph, Display.format_mfa(mfa))
+  defp add_node_and_edge_to_parent(graph, mfa, color, parent_vertex_id) do
+    {updated_graph, current_vertex_id} =
+      Graph.add_vertex(graph, Display.format_mfa(mfa), color: color)
 
     {updated_graph_2, _edge_id} =
       Graph.add_edge(
         updated_graph,
         parent_vertex_id,
-        current_vertex_id,
+        current_vertex_id
         # label: "fxn_name",
-        color: "green"
+        # color: "green"
       )
 
     {updated_graph_2, current_vertex_id}
