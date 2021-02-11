@@ -36,7 +36,7 @@ Is it just to visualize the system?
 Visual learning?
 
 ### Feedback from 1st real test case
-* very wide without listing local functions
+* ✅ very wide without listing local functions
 * (Bug 🐛) Prevent endless loops on circular deps
   * Ex - find one or create it. Not in compilation step, but in graph step
 
@@ -64,7 +64,7 @@ Conclusion - `Module Tree` is a cool idea. There are a few things I would need b
 * ✅ Make it easy to run on other repositories
 * ✅ Display local branches
 * ✅ Add image to Readme
-* (Idea) Color nodes based on module name, so that we can see redundancy
+* ✅ (Idea) Color nodes based on module name, so that we can see redundancy
 * ✅ Filter non-user code
   * ✅ Don't want to display `Enum` calls, etc. `CodeVis.ProjectAnalysis`
   * ✅ Test gathering user modules
