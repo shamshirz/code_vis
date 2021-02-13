@@ -26,10 +26,10 @@ defmodule Display do
   @spec print_map(map(), mfa(), integer()) :: String.t()
   defp print_map(map, mfa, level \\ 0) do
     case Map.fetch!(map, mfa) do
-      [] ->
+      %{children: []} ->
         "#{indent(level)}#{format_mfa(mfa)} -> leaf"
 
-      other_calls ->
+      %{children: other_calls} ->
         sub_lines =
           other_calls
           |> Enum.map(fn next -> print_map(map, next, level + 2) end)

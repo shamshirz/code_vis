@@ -43,11 +43,11 @@ defmodule Display.GraphIt do
       add_node_and_edge_to_parent(graph, mfa, color, parent_vertex_id)
 
     case Map.fetch!(map, mfa) do
-      [] ->
+      %{children: []} ->
         # Leaf, do nothing
         updated_graph
 
-      target_mfas ->
+      %{children: target_mfas} ->
         # Branch, gather children
         target_mfas
         |> Enum.flat_map(fn target -> traverse_local_functions(map, target, mfa) end)
@@ -74,6 +74,8 @@ defmodule Display.GraphIt do
 
   defp traverse_local_functions(_map, target_mfa, _current_mfa), do: [target_mfa]
 
+  # Get or Create the new node in the graph
+  # If there is a parent node (all except for root), draw an edge
   @spec add_node_and_edge_to_parent(Graphvix.Graph.t(), mfa(), color :: String.t(), nil | any()) ::
           {Graphvix.Graph.t(), vertex_id :: any()}
   defp add_node_and_edge_to_parent(graph, mfa, color, nil) do
@@ -95,4 +97,11 @@ defmodule Display.GraphIt do
 
     {updated_graph_2, current_vertex_id}
   end
+
+  # defp get_or_create_node(graph, mfa, color) do
+  #   case(Graph)
+
+  #   {updated_graph, current_vertex_id} =
+  #     Graph.add_vertex(graph, Display.format_mfa(mfa), color: color)
+  # end
 end
