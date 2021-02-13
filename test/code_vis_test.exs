@@ -34,17 +34,21 @@ defmodule CodeVisTest do
         |> CodeVis.module_stats()
         |> CodeVis.assign_module_colors()
 
-      assert get_in(stats, [Main, :color]) == "red"
-      assert get_in(stats, [Main.One, :color]) == "orange"
-      assert get_in(stats, [Main.Two, :color]) == "yellow"
+      main_color = get_in(stats, [Main, :color])
+      main_1_color = get_in(stats, [Main.One, :color])
+      main_2_color = get_in(stats, [Main.Two, :color])
+
+      assert main_color != main_1_color
+      assert main_color != main_2_color
+      assert main_1_color != main_2_color
     end
   end
 
   defp adjacency_map do
     %{
-      {Main, :fxn, 0} => [{Main.One, :fxn, 0}, {Main.Two, :fxn, 0}],
-      {Main.One, :fxn, 0} => [{Main.Two, :fxn, 0}],
-      {Main.Two, :fxn, 0} => []
+      {Main, :fxn, 0} => %{children: [{Main.One, :fxn, 0}, {Main.Two, :fxn, 0}]},
+      {Main.One, :fxn, 0} => %{children: [{Main.Two, :fxn, 0}]},
+      {Main.Two, :fxn, 0} => %{children: []}
     }
   end
 end

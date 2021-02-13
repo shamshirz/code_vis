@@ -3,7 +3,7 @@ defmodule CodeVis do
   Entry point for operating on traced function data
   """
 
-  @type adjacency_map :: %{mfa() => [mfa()]}
+  @type adjacency_map :: %{mfa() => %{children: [mfa()]}}
   # This should just be module Keyed - turn into a struct too
   @type module_stats :: %{mfa() => %{incoming: nil, outgoing: integer(), color: nil | String.t()}}
 
@@ -33,10 +33,10 @@ defmodule CodeVis do
     case Repo.lookup(current_mfa) |> Enum.filter(fn {m, _f, _a} -> m in user_modules end) do
       [] ->
         # base case
-        Map.put(accumulator, current_mfa, [])
+        Map.put(accumulator, current_mfa, %{children: []})
 
       target_mfas ->
-        updated = Map.put(accumulator, current_mfa, target_mfas)
+        updated = Map.put(accumulator, current_mfa, %{children: target_mfas})
 
         Enum.reduce(target_mfas, updated, fn next_mfa, acc ->
           function_tree_from(acc, next_mfa, user_modules)
@@ -46,7 +46,8 @@ defmodule CodeVis do
 
   @spec module_stats(adjacency_map()) :: module_stats()
   def module_stats(adjacency_map) do
-    Enum.reduce(adjacency_map, %{}, fn {{module, _fxn, _arity}, list_of_mfas}, accumulator ->
+    Enum.reduce(adjacency_map, %{}, fn {{module, _fxn, _arity}, %{children: list_of_mfas}},
+                                       accumulator ->
       outgoing_edge_count = length(list_of_mfas)
       new = %{incoming: nil, outgoing: outgoing_edge_count, color: nil}
 
