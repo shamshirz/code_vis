@@ -21,7 +21,8 @@ defmodule TestProject.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:code_vis, path: "../"}
+      {:code_vis, path: "../"},
+      {:stream_data, "~> 0.1", only: [:dev, :test]}
     ]
   end
 end

@@ -13,8 +13,8 @@ defmodule Display do
     |> GraphIt.to_file()
   end
 
-  @spec as_io(map(), mfa()) :: :ok
-  def as_io(map, root_mfa) do
+  @spec as_string(map(), mfa()) :: String.t()
+  def as_string(map, root_mfa) do
     stats =
       map
       |> CodeVis.module_stats()
@@ -23,7 +23,6 @@ defmodule Display do
     map
     |> GraphIt.new(root_mfa, stats)
     |> GraphIt.to_string()
-    |> IO.puts()
   end
 
   @spec format_mfa(mfa()) :: String.t()
