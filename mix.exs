@@ -23,6 +23,7 @@ defmodule CodeVis.MixProject do
   defp deps do
     [
       {:graphvix, "~> 1.0.0"},
+      {:plug_cowboy, "~> 2.0"},
       {:stream_data, "~> 0.1", only: [:dev, :test]}
     ]
   end
