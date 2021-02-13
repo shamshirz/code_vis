@@ -2,7 +2,7 @@
 
 Compile-time tool to visualize elixir applications flow.
 
-![Function Call Tree](first_graph.png)
+![Function Call Tree](graphNotTree.png)
 
 ## Setup
 

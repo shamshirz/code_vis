@@ -24,7 +24,10 @@ defmodule Display.GraphIt do
   First pass - make everything in the printed version as node, no edges
   """
   @spec new(CodeVis.adjacency_map(), mfa(), CodeVis.module_stats()) :: Graphvix.Graph.t()
-  def new(map, mfaroot, module_stats), do: add_node(map, module_stats, mfaroot, nil, Graph.new())
+  def new(map, mfaroot, module_stats) do
+    {_updated_map, graph} = add_node(map, module_stats, mfaroot, nil, Graph.new())
+    graph
+  end
 
   @spec to_file(Graphvix.Graph.t(), String.t()) :: :ok
   def to_file(graph, file_name \\ "_graphs/first_graph"), do: Graph.compile(graph, file_name)
@@ -35,54 +38,56 @@ defmodule Display.GraphIt do
           mfa(),
           edge_id :: any(),
           Graphvix.Graph.t()
-        ) :: Graphvix.Graph.t()
+        ) :: {map(), Graphvix.Graph.t()}
   defp add_node(map, module_stats, mfa, parent_vertex_id, graph) do
     %{color: color} = Map.get(module_stats, elem(mfa, 0), %{color: "grey"})
 
-    {updated_graph, current_vertex_id} =
-      add_node_and_edge_to_parent(graph, mfa, color, parent_vertex_id)
-
+    # If the mfa already has a node in the graph, draw edge and we are done
+    # if not, allow a new one to be created and proceed
     case Map.fetch!(map, mfa) do
-      %{children: []} ->
-        # Leaf, do nothing
-        updated_graph
+      %{vertex_id: vertex_id} ->
+        {updated_graph, _current_vertex_id} =
+          add_node_and_edge_to_parent(graph, vertex_id, color, parent_vertex_id)
 
-      %{children: target_mfas} ->
-        # Branch, gather children
-        target_mfas
-        |> Enum.flat_map(fn target -> traverse_local_functions(map, target, mfa) end)
-        |> Enum.reduce(updated_graph, fn target_mfa, acc ->
-          add_node(map, module_stats, target_mfa, current_vertex_id, acc)
-        end)
+        {map, updated_graph}
+
+      mfa_info ->
+        # This is a new node
+        {updated_graph, current_vertex_id} =
+          add_node_and_edge_to_parent(graph, mfa, color, parent_vertex_id)
+
+        updated_mfa_info = Map.put(mfa_info, :vertex_id, current_vertex_id)
+        updated_map = Map.put(map, mfa, updated_mfa_info)
+
+        case updated_mfa_info do
+          %{children: []} ->
+            # Leaf, do nothing
+            {updated_map, updated_graph}
+
+          %{children: target_mfas} ->
+            # Branch, gather children
+            target_mfas
+            |> Enum.reduce({updated_map, updated_graph}, fn target_mfa, {acc_map, acc_graph} ->
+              add_node(acc_map, module_stats, target_mfa, current_vertex_id, acc_graph)
+            end)
+        end
     end
   end
 
-  # Uncomment to enable collapsing local functions into a single node
-  # ==========================================
-  # if the target is in the same module, traverse it's calls
-  # recursively traverse local functions, returning only remote calls
-  # @spec traverse_local_functions(map, mfa(), mfa()) :: [mfa()]
-  # defp traverse_local_functions(
-  #        map,
-  #        {same_module, _, _} = target_mfa,
-  #        {same_module, _, _} = current_mfa
-  #      ) do
-  #   map
-  #   |> Map.fetch!(target_mfa)
-  #   |> Enum.flat_map(fn target -> traverse_local_functions(map, target, current_mfa) end)
-  # end
-
-  defp traverse_local_functions(_map, target_mfa, _current_mfa), do: [target_mfa]
-
   # Get or Create the new node in the graph
   # If there is a parent node (all except for root), draw an edge
-  @spec add_node_and_edge_to_parent(Graphvix.Graph.t(), mfa(), color :: String.t(), nil | any()) ::
+  @spec add_node_and_edge_to_parent(
+          Graphvix.Graph.t(),
+          mfa() | (vertex_id :: any()),
+          color :: String.t(),
+          nil | any()
+        ) ::
           {Graphvix.Graph.t(), vertex_id :: any()}
   defp add_node_and_edge_to_parent(graph, mfa, color, nil) do
     Graph.add_vertex(graph, Display.format_mfa(mfa), color: color)
   end
 
-  defp add_node_and_edge_to_parent(graph, mfa, color, parent_vertex_id) do
+  defp add_node_and_edge_to_parent(graph, {_, _, _} = mfa, color, parent_vertex_id) do
     {updated_graph, current_vertex_id} =
       Graph.add_vertex(graph, Display.format_mfa(mfa), color: color)
 
@@ -98,10 +103,17 @@ defmodule Display.GraphIt do
     {updated_graph_2, current_vertex_id}
   end
 
-  # defp get_or_create_node(graph, mfa, color) do
-  #   case(Graph)
+  defp add_node_and_edge_to_parent(graph, current_vertex_id, _color, parent_vertex_id) do
+    # Node already exists case
+    {updated_graph, _edge_id} =
+      Graph.add_edge(
+        graph,
+        parent_vertex_id,
+        current_vertex_id
+        # label: "fxn_name",
+        # color: "green"
+      )
 
-  #   {updated_graph, current_vertex_id} =
-  #     Graph.add_vertex(graph, Display.format_mfa(mfa), color: color)
-  # end
+    {updated_graph, current_vertex_id}
+  end
 end
