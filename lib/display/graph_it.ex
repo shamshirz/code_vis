@@ -32,6 +32,9 @@ defmodule Display.GraphIt do
   @spec to_file(Graphvix.Graph.t(), String.t()) :: :ok
   def to_file(graph, file_name \\ "_graphs/first_graph"), do: Graph.compile(graph, file_name)
 
+  @spec to_string(Graphvix.Graph.t()) :: String.t()
+  def to_string(graph), do: Graph.to_dot(graph)
+
   @spec add_node(
           CodeVis.adjacency_map(),
           CodeVis.module_stats(),

@@ -33,9 +33,8 @@ defmodule Mix.Tasks.Visualize do
     root = parse_root(args)
     map = CodeVis.function_tree_from(root)
 
-
     IO.puts("Results for: #{Display.format_mfa(root)}\n")
-    Display.as_io(map, root)
+    Display.as_string(map, root) |> IO.puts()
     Display.as_file(map, root)
   end
 

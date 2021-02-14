@@ -10,7 +10,14 @@ Compile-time tool to visualize elixir applications flow.
 # External dep on `dot` cmd line util
 > brew install graphviz
 > mix deps.get && mix compile
+# Static single graph
 > mix try
+
+# Dynamic graphing
+> cd test_project
+> mix deps.get && iex -S mix
+iex(1)> {:ok, _} = Plug.Cowboy.http CodeVis.Plug.Visualize, []
+# open localhost:4000?mfa=TestProject.i_alias/0
 ```
 
 ## Objectives
@@ -24,11 +31,12 @@ Compile-time tool to visualize elixir applications flow.
 * 50% of users can tell you what `CodeVis` does
 ## Actions
 * Remove circular dep bug (don't add duplicate nodes)
+ * Thought I fixed it, but I didn't
 * Add Plug to display graph in basic html
-  * Add Plug to Lib (instructions to add to user project)
+  * ✅ Add Plug to Lib (instructions to add to user project)
   * Add Template for view (empty html single value)
-  * ⚠️ Run trace on first landing on url
-  * Display text graph on page
+  * ✅ Run trace on plug init
+  * ✅ Display png on the page!
 * Tests
   * Filtering out of non-user modules
   * Intermediate -> Graph
