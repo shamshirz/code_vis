@@ -2,7 +2,7 @@
 
 Compile-time tool to visualize elixir applications flow.
 
-![Function Call Tree](graphNotTree.png)
+![Function Call Tree](images/graphNotTree.png)
 
 ## Setup
 
@@ -13,9 +13,9 @@ Compile-time tool to visualize elixir applications flow.
 # Static single graph
 > mix try
 
-# Dynamic graphing, opens browser
+# Dynamic graphing
 # try localhost:4001?mfa=TestProject.i_alias/0
-> mix live
+> cd test_project && iex -S mix
 ```
 
 ## Objectives
