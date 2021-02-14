@@ -32,7 +32,8 @@ defmodule CodeVis.MixProject do
     [
       try: [
         "cmd 'cd test_project && mix visualize TestProject.i_alias/0 && open _graphs/first_graph.png'"
-      ]
+      ],
+      live: ["cmd 'cd test_project && open http://localhost:4001 && mix run --no-halt'"]
     ]
   end
 end
