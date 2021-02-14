@@ -7,7 +7,8 @@ defmodule TestProject.MixProject do
       version: "0.1.0",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      aliases: aliases()
     ]
   end
 
@@ -24,6 +25,12 @@ defmodule TestProject.MixProject do
     [
       {:code_vis, path: "../"},
       {:stream_data, "~> 0.1", only: [:dev, :test]}
+    ]
+  end
+
+  defp aliases do
+    [
+      live: ["run --no-halt", "cmd 'open http://localhost:4001'"]
     ]
   end
 end

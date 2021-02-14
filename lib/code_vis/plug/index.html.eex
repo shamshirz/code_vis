@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Visualize Index</title>
+    <%# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.0.0/normalize.css" charset="utf-8"> %>
+  </head>
+
+  <body>
+    <main>
+      <h1>Header</h1>
+      <p>
+        We are displaying a page!
+        <br>Go <a href="/?mfa=TestProject.i_alias/0">to TestProject.i_alias/0</a> to see an example!
+      </p>
+    </main>
+  </body>
+</html>
