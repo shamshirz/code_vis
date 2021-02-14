@@ -24,7 +24,15 @@ defmodule CodeVis.Repo do
     |> Enum.map(&elem(&1, 1))
   end
 
-  @spec insert({caller :: mfa(), target :: mfa()}) :: :ok
+  @spec get_fuctions_by_module :: %{module() => [mfa()]}
+  def get_fuctions_by_module() do
+    all()
+    |> Enum.map(&elem(&1, 0))
+    |> Enum.dedup()
+    |> Enum.group_by(fn {module, _f, _a} -> module end)
+  end
+
+  @spec insert({caller :: mfa(), target :: mfa()}) :: true
   def insert(kv_tuple) do
     :ets.insert(@table_name, kv_tuple)
   end
@@ -40,5 +48,6 @@ defmodule CodeVis.Repo do
     end
   end
 
-
+  @spec all :: [{caller :: mfa(), target :: mfa()}]
+  defp all(), do: :ets.tab2list(@table_name)
 end

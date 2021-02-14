@@ -18,11 +18,14 @@ defmodule CodeVis.Plug.Visualize do
   alias CodeVis.Repo
 
   index_template = Path.join(__DIR__, "index.html.eex")
-  EEx.function_from_file(:defp, :index, index_template)
+  EEx.function_from_file(:defp, :index, index_template, [:assigns])
 
   @spec render_index(Plug.Conn.t()) :: Plug.Conn.t()
   defp render_index(conn) do
-    index()
+    assigns = %{functions: Repo.get_fuctions_by_module()}
+
+    assigns
+    |> index()
     |> rendered(conn)
   end
 

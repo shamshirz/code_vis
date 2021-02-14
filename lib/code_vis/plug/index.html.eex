@@ -10,11 +10,17 @@
 
   <body>
     <main>
-      <h1>Header</h1>
-      <p>
-        We are displaying a page!
-        <br>Go <a href="/?mfa=TestProject.i_alias/0">to TestProject.i_alias/0</a> to see an example!
-      </p>
+      <h1>Available Functions</h1>
+
+      <%= for {module, function_mfas} <- @functions do %>
+        <h3> <%= module %> </h3>
+        <ul>
+        <%= for function_mfa <- function_mfas do %>
+          <% function_string = Display.format_mfa(function_mfa) %>
+          <li><a href="/?mfa=<%= function_string %>"> <%= function_string %></a></li>
+        <% end %>
+        </ul>
+      <% end %>
     </main>
   </body>
 </html>
