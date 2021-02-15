@@ -13,7 +13,28 @@ defmodule CodeVis.Plug.Visualize do
 
   import Plug.Conn
 
+  require EEx
+
   alias CodeVis.Repo
+
+  index_template = Path.join(__DIR__, "index.html.eex")
+  EEx.function_from_file(:defp, :index, index_template, [:assigns])
+
+  @spec render_index(Plug.Conn.t()) :: Plug.Conn.t()
+  defp render_index(conn) do
+    assigns = %{functions: Repo.get_fuctions_by_module()}
+
+    assigns
+    |> index()
+    |> rendered(conn)
+  end
+
+  @spec rendered(String.t(), Plug.Conn.t()) :: Plug.Conn.t()
+  defp rendered(html, conn) do
+    conn
+    |> put_resp_content_type("text/html")
+    |> send_resp(200, html)
+  end
 
   # Init will recompile your whole project `:eek`
   def init(options) do
@@ -37,6 +58,9 @@ defmodule CodeVis.Plug.Visualize do
         Display.as_file(map, mfa)
         Plug.Conn.send_file(conn, 200, "./_graphs/first_graph.png")
 
+      {:error, :redirect} ->
+        render_index(conn)
+
       {:error, reason} ->
         conn
         |> put_resp_content_type("text/plain")
@@ -44,7 +68,8 @@ defmodule CodeVis.Plug.Visualize do
     end
   end
 
-  @spec get_query_params_mfa(Plug.Conn.t()) :: {:ok, mfa()} | {:error, String.t()}
+  @spec get_query_params_mfa(Plug.Conn.t()) ::
+          {:ok, mfa()} | {:error, :redirect | String.t()}
   defp get_query_params_mfa(conn) do
     case fetch_query_params(conn) |> Map.get(:query_params) do
       %{"mfa" => mfa_string} ->
@@ -57,7 +82,7 @@ defmodule CodeVis.Plug.Visualize do
         end
 
       _ ->
-        {:error, "Query param missing. Expected ?mfa=Mod.fxn/arity"}
+        {:error, :redirect}
     end
   end
 end

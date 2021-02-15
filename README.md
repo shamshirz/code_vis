@@ -2,7 +2,7 @@
 
 Compile-time tool to visualize elixir applications flow.
 
-![Function Call Tree](graphNotTree.png)
+![Function Call Tree](images/graphNotTree.png)
 
 ## Setup
 
@@ -14,10 +14,8 @@ Compile-time tool to visualize elixir applications flow.
 > mix try
 
 # Dynamic graphing
-> cd test_project
-> mix deps.get && iex -S mix
-iex(1)> {:ok, _} = Plug.Cowboy.http CodeVis.Plug.Visualize, []
-# open localhost:4000?mfa=TestProject.i_alias/0
+# try localhost:4001?mfa=TestProject.i_alias/0
+> cd test_project && iex -S mix
 ```
 
 ## Objectives
@@ -30,13 +28,15 @@ iex(1)> {:ok, _} = Plug.Cowboy.http CodeVis.Plug.Visualize, []
 * Increased use base by over 100%
 * 50% of users can tell you what `CodeVis` does
 ## Actions
-* Remove circular dep bug (don't add duplicate nodes)
- * Thought I fixed it, but I didn't
 * Add Plug to display graph in basic html
   * ✅ Add Plug to Lib (instructions to add to user project)
   * Add Template for view (empty html single value)
+    * Add Search or list to display available fxns
+    * Add JS to display the graph
   * ✅ Run trace on plug init
   * ✅ Display png on the page!
+* Remove circular dep bug (don't add duplicate nodes)
+ * Thought I fixed it, but I didn't - create test case
 * Tests
   * Filtering out of non-user modules
   * Intermediate -> Graph
