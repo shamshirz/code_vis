@@ -3,10 +3,12 @@ defmodule CodeVis.Plug.Visualize do
 
   Try it!
 
-  $ iex -S mix
-  > {:ok, _} = Plug.Cowboy.http CodeVis.Plug.Visualize, []
-  {:ok, #PID<...>}
-  # Open http://localhost:4000/?mfa=TestProject.i_alias/0
+  ```bash
+    $ iex -S mix
+    > {:ok, _} = Plug.Cowboy.http CodeVis.Plug.Visualize, []
+    {:ok, #PID<...>}
+    # Open http://localhost:4000/?mfa=TestProject.i_alias/0
+  ```
   """
 
   @behaviour Plug
@@ -14,6 +16,7 @@ defmodule CodeVis.Plug.Visualize do
   import Plug.Conn
 
   require EEx
+  require Logger
 
   alias CodeVis.Repo
 
@@ -43,7 +46,12 @@ defmodule CodeVis.Plug.Visualize do
     end
 
     Repo.start()
+    Logger.info("CodeVis trace initiated…")
+
     Mix.Task.rerun("compile.elixir", ["--force", "--tracer", "CodeVis.FunctionTracer"])
+
+    Logger.info("CodeVis trace complete 🎉")
+    Logger.info("CodeVis is live with options: #{inspect(options)}")
 
     options
   end
