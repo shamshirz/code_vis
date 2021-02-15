@@ -14,8 +14,8 @@ Compile-time tool to visualize elixir applications flow.
 > mix try
 
 # Dynamic graphing
-# try localhost:4001?mfa=TestProject.i_alias/0
-> cd test_project && iex -S mix
+# try localhost:1337?mfa=TestProject.i_alias/0
+> cd test_project && mix code_vis.server
 ```
 
 ## Objectives
@@ -28,15 +28,14 @@ Compile-time tool to visualize elixir applications flow.
 * Increased use base by over 100%
 * 50% of users can tell you what `CodeVis` does
 ## Actions
-* Add Plug to display graph in basic html
-  * ✅ Add Plug to Lib (instructions to add to user project)
-  * Add Template for view (empty html single value)
-    * Add Search or list to display available fxns
-    * Add JS to display the graph
-  * ✅ Run trace on plug init
-  * ✅ Display png on the page!
+* ✅ Allow server to run outside of users application!
+* Guide on how to add it to a project now!
+* Replace cmd line dependency with js bundle in browser
+  * Display graph in browser is easier than asking users to download a cmd line util
 * Remove circular dep bug (don't add duplicate nodes)
  * Thought I fixed it, but I didn't - create test case
+* (Maybe) search for function in index
+* (Maybe) ngrok deployment for specific users of a project
 * Tests
   * Filtering out of non-user modules
   * Intermediate -> Graph
