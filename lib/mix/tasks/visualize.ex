@@ -19,6 +19,7 @@ defmodule Mix.Tasks.Visualize do
 
   alias CodeVis.Repo
 
+  @deprecated "Please use mix code_vis.server"
   @impl true
   def run(args) do
     unless Version.match?(System.version(), ">= 1.10.0-rc") do
