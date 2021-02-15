@@ -1,4 +1,4 @@
-defmodule TestProject.Application do
+defmodule CodeVis.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
@@ -7,11 +7,11 @@ defmodule TestProject.Application do
 
   @impl true
   def start(_type, _args) do
-    children = []
+    children = [
+      {Plug.Cowboy, scheme: :http, plug: CodeVis.Plug.Visualize, options: [port: 1337]}
+    ]
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: TestProject.Supervisor]
+    opts = [strategy: :one_for_one, name: CodeVis.Supervisor]
     Supervisor.start_link(children, opts)
   end
 end

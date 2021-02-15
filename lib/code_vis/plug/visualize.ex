@@ -3,10 +3,12 @@ defmodule CodeVis.Plug.Visualize do
 
   Try it!
 
-  $ iex -S mix
-  > {:ok, _} = Plug.Cowboy.http CodeVis.Plug.Visualize, []
-  {:ok, #PID<...>}
-  # Open http://localhost:4000/?mfa=TestProject.i_alias/0
+  ```bash
+    $ iex -S mix
+    > {:ok, _} = Plug.Cowboy.http CodeVis.Plug.Visualize, []
+    {:ok, #PID<...>}
+    # Open http://localhost:4000/?mfa=TestProject.i_alias/0
+  ```
   """
 
   @behaviour Plug
@@ -14,11 +16,15 @@ defmodule CodeVis.Plug.Visualize do
   import Plug.Conn
 
   require EEx
+  require Logger
 
   alias CodeVis.Repo
 
   index_template = Path.join(__DIR__, "index.html.eex")
   EEx.function_from_file(:defp, :index, index_template, [:assigns])
+
+  graph_template = Path.join(__DIR__, "graph.html.eex")
+  EEx.function_from_file(:defp, :graph, graph_template, [:assigns])
 
   @spec render_index(Plug.Conn.t()) :: Plug.Conn.t()
   defp render_index(conn) do
@@ -26,6 +32,17 @@ defmodule CodeVis.Plug.Visualize do
 
     assigns
     |> index()
+    |> rendered(conn)
+  end
+
+  @spec render_graph(Plug.Conn.t(), mfa()) :: Plug.Conn.t()
+  defp render_graph(conn, mfa) do
+    map = CodeVis.function_tree_from(mfa)
+    dot_string = Display.as_string(map, mfa)
+    assigns = %{dot_string: dot_string, mfa: mfa}
+
+    assigns
+    |> graph()
     |> rendered(conn)
   end
 
@@ -43,20 +60,20 @@ defmodule CodeVis.Plug.Visualize do
     end
 
     Repo.start()
+    Logger.info("CodeVis trace initiated…")
+
     Mix.Task.rerun("compile.elixir", ["--force", "--tracer", "CodeVis.FunctionTracer"])
+
+    Logger.info("CodeVis trace complete 🎉")
+    Logger.info("CodeVis is live with options: #{inspect(options)}")
 
     options
   end
 
-  # Receives current connection and options from init
-  # Expects /your_selected_path?mfa=TestProject.i_alias/0
-
   def call(conn, _opts) do
     case get_query_params_mfa(conn) do
       {:ok, mfa} ->
-        map = CodeVis.function_tree_from(mfa)
-        Display.as_file(map, mfa)
-        Plug.Conn.send_file(conn, 200, "./_graphs/first_graph.png")
+        render_graph(conn, mfa)
 
       {:error, :redirect} ->
         render_index(conn)

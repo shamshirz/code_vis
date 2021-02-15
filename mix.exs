@@ -8,14 +8,16 @@ defmodule CodeVis.MixProject do
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      aliases: aliases()
+      aliases: aliases(),
+      xref: [exclude: IEx]
     ]
   end
 
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger],
+      mod: {CodeVis.Application, []}
     ]
   end
 
@@ -32,8 +34,7 @@ defmodule CodeVis.MixProject do
     [
       try: [
         "cmd 'cd test_project && mix visualize TestProject.i_alias/0 && open _graphs/first_graph.png'"
-      ],
-      live: ["cmd 'cd test_project && open http://localhost:4001 && mix run --no-halt'"]
+      ]
     ]
   end
 end

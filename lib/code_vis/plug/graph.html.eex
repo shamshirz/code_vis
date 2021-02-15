@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="//d3js.org/d3.v5.min.js"></script>
+    <script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
+    <script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
+
+    <% {_m, function, arity} = @mfa %>
+    <title><%= "#{Atom.to_string(function)}/#{arity}" %> Graph</title>
+  </head>
+
+  <body>
+    <main>
+      <h1><%= Display.format_mfa(@mfa) %></h1>
+      <input type="hidden" id="data-input" value='<%= @dot_string %>' />
+
+      <div id="graph" style="text-align: center; border-style: solid;"></div>
+    </main>
+    <script>
+      var dotString = document.getElementById("data-input").value
+
+      d3.select("#graph")
+          .graphviz()
+          .renderDot(dotString);
+    </script>
+  </body>
+</html>

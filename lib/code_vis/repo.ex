@@ -7,11 +7,18 @@ defmodule CodeVis.Repo do
   @table_name :functions
 
   @doc """
-  Starts `:functions` table
+  Starts `:functions` table or uses existing.
+  Global table - TODO - allow multiple?
   """
   @spec start :: any()
   def start() do
-    :ets.new(@table_name, [:named_table, :public, :duplicate_bag])
+    case :ets.whereis(@table_name) do
+      :undefined ->
+        :ets.new(@table_name, [:named_table, :public, :duplicate_bag])
+
+      _ref ->
+        :ok
+    end
   end
 
   @doc """
