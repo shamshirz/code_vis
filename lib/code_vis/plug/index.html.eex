@@ -4,13 +4,16 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.css">
+
     <title>Visualize Index</title>
-    <%# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.0.0/normalize.css" charset="utf-8"> %>
   </head>
 
   <body>
     <main>
       <h1>Available Functions</h1>
+
+      <input id="function-input" class="awesomplete" data-list='<%= @functions |> Enum.flat_map(fn {_m, mfas} -> mfas end) |> Enum.map(&Display.format_mfa/1) |> Enum.join(", ") %>' />
 
       <%= for {module, function_mfas} <- @functions do %>
         <h3> <%= module %> </h3>
@@ -21,6 +24,17 @@
         <% end %>
         </ul>
       <% end %>
+
+
     </main>
   </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.js"></script>
+  <script>
+  document.getElementById('function-input').addEventListener("awesomplete-select", function(event) {
+      <%# String name of function %>
+      console.log( event.text.value );
+      window.location.href = "/?mfa=" + event.text.value;
+  });
+  </script>
+
 </html>

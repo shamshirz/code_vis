@@ -25,7 +25,7 @@ end
 ## Objectives
 1. Get this in the hands of users
     * ✅ Easier to interact with than a mix CLI input
-    * More accessible than needing to know `mfa()` by heart
+    * ✅ More accessible than needing to know `mfa()` by heart
 2. Make value really obvious
     * Data is intuitive
 ### Key Results
@@ -38,8 +38,8 @@ end
   * ✅ Display graph in browser is easier than asking users to download a cmd line util
   * Remove existing mix task
 * Remove circular dep bug (don't add duplicate nodes)
- * Thought I fixed it, but I didn't - create test case
-* (Maybe) search for function in index
+  * Thought I fixed it, but I didn't - create test case
+* ✅ search for function in index
 * (Maybe) ngrok deployment for specific users of a project
 * Tests
   * Filtering out of non-user modules
@@ -58,6 +58,7 @@ end
 
 * [Dashbit tracer example](https://gist.github.com/wojtekmach/4e04cbda82ba88af3f84c44ec746b7ca#file-import2alias-ex-L20)
 * [AppSignal tracer](https://blog.appsignal.com/2020/03/10/building-compile-time-tools-with-elixir-compiler-tracing-features.html)
+* [Basic JS autocomplete](https://github.com/leaverou/awesomplete)
 
 ## Development Setup
 
