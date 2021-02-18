@@ -7,40 +7,53 @@ defmodule CodeVisTest do
       my_mods =
         Enum.sort([
           CodeVis,
-          Mix.Tasks.Visualize,
-          Display.GraphIt,
-          CodeVis.ProjectAnalysis,
+          CodeVis.Application,
           CodeVis.FunctionTracer,
+          CodeVis.Plug.Visualize,
+          CodeVis.ProjectAnalysis,
           CodeVis.Repo,
-          Display
+          Display,
+          Display.GraphIt,
+          Mix.Tasks.CodeVis.Server,
+          Mix.Tasks.Visualize
         ])
 
       assert my_mods == ProjectAnalysis.user_modules() |> Enum.sort()
     end
   end
 
-  describe "CodeVis" do
-    test "module_stats/1" do
-      stats = CodeVis.module_stats(adjacency_map())
+  describe "Display" do
+    test "as_string/2 graphs the correct number of vertices" do
+      result = Display.as_string(adjacency_map(), {Main, :fxn, 0})
 
-      assert get_in(stats, [Main, :outgoing]) == 2
-      assert get_in(stats, [Main.One, :outgoing]) == 1
-      assert get_in(stats, [Main.Two, :outgoing]) == 0
+      assert result =~ "v0"
+      assert result =~ "v1"
+      assert result =~ "v2"
+      refute result =~ "v3"
     end
 
-    test "module_stats_colors/1" do
-      stats =
-        adjacency_map()
-        |> CodeVis.module_stats()
-        |> CodeVis.assign_module_colors()
+    test "as_string/2 graphs the correct edges" do
+      result = Display.as_string(adjacency_map(), {Main, :fxn, 0})
 
-      main_color = get_in(stats, [Main, :color])
-      main_1_color = get_in(stats, [Main.One, :color])
-      main_2_color = get_in(stats, [Main.Two, :color])
+      assert result =~ "v0 -> v1"
+      assert result =~ "v1 -> v2"
+      assert result =~ "v0 -> v2"
+      refute result =~ "v2 -> v1"
+    end
 
-      assert main_color != main_1_color
-      assert main_color != main_2_color
-      assert main_1_color != main_2_color
+    test "as_string/2 fails with circular dep" do
+      map = %{
+        {Main, :fxn, 0} => %{children: [{Main.One, :fxn, 0}, {Main.Two, :fxn, 0}]},
+        {Main.One, :fxn, 0} => %{children: [{Main.Two, :fxn, 0}]},
+        {Main.Two, :fxn, 0} => %{children: [{Main, :fxn, 0}]}
+      }
+
+      result = Display.as_string(map, {Main, :fxn, 0})
+
+      assert result =~ "v0 -> v1"
+      assert result =~ "v1 -> v2"
+      assert result =~ "v0 -> v2"
+      refute result =~ "v2 -> v1"
     end
   end
 
