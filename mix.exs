@@ -6,6 +6,7 @@ defmodule CodeVis.MixProject do
       app: :code_vis,
       version: "0.1.1",
       elixir: "~> 1.11",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       aliases: aliases(),
@@ -21,6 +22,9 @@ defmodule CodeVis.MixProject do
     ]
   end
 
+  defp elixirc_paths(env) when env in [:pre_commit, :test], do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
@@ -34,7 +38,9 @@ defmodule CodeVis.MixProject do
     [
       try: [
         "cmd 'cd test_project && mix visualize TestProject.i_alias/0 && open _graphs/first_graph.png'"
-      ]
+      ],
+      # Prevents plug from initializing and recompiling
+      test: "test --no-start"
     ]
   end
 end

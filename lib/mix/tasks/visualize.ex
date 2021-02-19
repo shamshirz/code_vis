@@ -32,7 +32,7 @@ defmodule Mix.Tasks.Visualize do
     IO.puts("Trace complete. Building Tree…")
 
     root = parse_root(args)
-    map = CodeVis.function_tree_from(root)
+    map = CodeVis.build_adjacency_map(root)
 
     IO.puts("Results for: #{Display.format_mfa(root)}\n")
     Display.as_string(map, root) |> IO.puts()
