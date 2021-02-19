@@ -37,7 +37,7 @@ defmodule CodeVis.Plug.Visualize do
 
   @spec render_graph(Plug.Conn.t(), mfa()) :: Plug.Conn.t()
   defp render_graph(conn, mfa) do
-    map = CodeVis.function_tree_from(mfa)
+    map = CodeVis.build_adjacency_map(mfa)
     dot_string = Display.as_string(map, mfa)
     assigns = %{dot_string: dot_string, mfa: mfa}
 
