@@ -40,8 +40,13 @@ defmodule CodeVis.Repo do
   end
 
   @spec insert({caller :: mfa(), target :: mfa()}) :: true
-  def insert(kv_tuple) do
+  def insert({one, two} = kv_tuple) when is_tuple(one) and is_tuple(two) do
     :ets.insert(@table_name, kv_tuple)
+  end
+
+  def insert(input) do
+    raise ArgumentError,
+      message: "I expect to only insert {mfa(), mfa()} tuples, not: #{inspect(input)}."
   end
 
   @spec first :: :error | any()
