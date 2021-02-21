@@ -57,6 +57,27 @@ defmodule CodeVisTest do
     end
   end
 
+  describe "GraphIt" do
+    test "can display a graph with multiple root nodes" do
+      map = %{
+        {Main, :fxn, 0} => %{children: [{Main.One, :fxn, 0}]},
+        {Main.One, :fxn, 0} => %{children: []},
+        {Side, :fxn, 0} => %{children: [{Side.One, :fxn, 0}]},
+        {Side.One, :fxn, 0} => %{children: []}
+      }
+
+      dot =
+        map
+        |> Display.GraphIt.new()
+        |> Display.GraphIt.to_string()
+        |> IO.inspect()
+
+      assert dot =~ "v0 -> v1"
+      assert dot =~ "v2 -> v3"
+      refute dot =~ "-> v2"
+    end
+  end
+
   describe "CodeVis" do
     test "can map recursive calls" do
       Repo.start()
@@ -91,6 +112,34 @@ defmodule CodeVisTest do
 
       assert Map.has_key?(adj_map, mfa_main)
       assert Map.get(adj_map, mfa_main) == %{children: []}
+    end
+
+    test "can build mega map" do
+      Repo.start()
+
+      user_modules =
+        [
+          mfa_main = {Main, :fxn, 0},
+          mfa_1 = {Main.One, :fxn, 0},
+          mfa_2 = {Main.Two, :fxn, 0},
+          mfa_side_tree = {Side, :fxn, 0},
+          mfa_side_tree_1 = {Side.One, :fxn, 0},
+          mfa_side_tree_2 = {Side.Two, :fxn, 0}
+        ]
+        |> Enum.map(&elem(&1, 0))
+        |> Enum.dedup()
+
+      Repo.insert({mfa_main, mfa_1})
+      Repo.insert({mfa_main, mfa_2})
+      Repo.insert({mfa_2, mfa_main})
+
+      Repo.insert({mfa_side_tree, mfa_side_tree_1})
+      Repo.insert({mfa_side_tree, mfa_side_tree})
+      Repo.insert({mfa_side_tree_2, mfa_side_tree_1})
+
+      map = CodeVis.build_mega_adjacency_map(user_modules)
+
+      assert length(Map.keys(map)) == 6
     end
   end
 

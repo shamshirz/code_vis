@@ -25,3 +25,18 @@ defmodule TestProject do
     defp local_remote, do: TestProject.ModuleA.fxn()
   end
 end
+
+defmodule SideTree do
+  def fxn do
+    SideTree.One.fxn()
+    SideTree.Two.fxn()
+  end
+
+  defmodule One do
+    def fxn, do: 4
+  end
+
+  defmodule Two do
+    def fxn, do: 4
+  end
+end

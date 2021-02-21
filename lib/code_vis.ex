@@ -65,4 +65,12 @@ defmodule CodeVis do
         end
     end
   end
+
+  @spec build_mega_adjacency_map([module()]) :: adjacency_map()
+  def build_mega_adjacency_map(user_modules \\ CodeVis.ProjectAnalysis.user_modules()) do
+    Repo.get_fuctions_by_module()
+    |> Map.values()
+    |> Enum.flat_map(fn x -> x end)
+    |> Enum.reduce(%{}, fn mfa, acc -> build_adjacency_map(acc, mfa, user_modules) end)
+  end
 end

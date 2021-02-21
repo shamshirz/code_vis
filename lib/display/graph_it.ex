@@ -26,6 +26,21 @@ defmodule Display.GraphIt do
     graph
   end
 
+  # run through each key, traversing all of their children and adding to the graph & updating the map
+  @spec new(CodeVis.adjacency_map()) :: Graphvix.Graph.t()
+  def new(map) do
+    {map_with_vertex_ids, graph} =
+      map
+      |> Map.keys()
+      |> Enum.reduce({map, Graph.new()}, fn mfa, {updated_map, updated_graph} ->
+        IO.puts("About to traverse mfa: #{inspect(mfa)}")
+        add_node(updated_map, mfa, nil, updated_graph)
+      end)
+
+    IO.inspect(map_with_vertex_ids, label: "Final Map")
+    graph
+  end
+
   @spec to_file(Graphvix.Graph.t(), String.t()) :: :ok
   def to_file(graph, file_name \\ "_graphs/first_graph"), do: Graph.compile(graph, file_name)
 
@@ -79,9 +94,12 @@ defmodule Display.GraphIt do
           nil | any()
         ) ::
           {Graphvix.Graph.t(), vertex_id :: any()}
-  defp add_node_and_edge_to_parent(graph, mfa, nil) do
+  defp add_node_and_edge_to_parent(graph, {_, _, _} = mfa, nil) do
     Graph.add_vertex(graph, Display.format_mfa(mfa))
   end
+
+  # Node already exists and it's a root, move on
+  defp add_node_and_edge_to_parent(graph, current_vertex_id, nil), do: {graph, current_vertex_id}
 
   defp add_node_and_edge_to_parent(graph, {_, _, _} = mfa, parent_vertex_id) do
     {updated_graph, current_vertex_id} = Graph.add_vertex(graph, Display.format_mfa(mfa))

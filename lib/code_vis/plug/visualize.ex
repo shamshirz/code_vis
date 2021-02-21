@@ -46,6 +46,21 @@ defmodule CodeVis.Plug.Visualize do
     |> rendered(conn)
   end
 
+  defp render_mega_graph(conn, mfa \\ {Fake, :fxn, 0}) do
+    map = CodeVis.build_mega_adjacency_map()
+
+    dot_string =
+      map
+      |> Display.GraphIt.new()
+      |> Display.GraphIt.to_string()
+
+    assigns = %{dot_string: dot_string, mfa: mfa}
+
+    assigns
+    |> graph()
+    |> rendered(conn)
+  end
+
   @spec rendered(String.t(), Plug.Conn.t()) :: Plug.Conn.t()
   defp rendered(html, conn) do
     conn
@@ -72,6 +87,9 @@ defmodule CodeVis.Plug.Visualize do
 
   def call(conn, _opts) do
     case get_query_params_mfa(conn) do
+      {:ok, {Fake, :fxn, 0}} ->
+        render_mega_graph(conn)
+
       {:ok, mfa} ->
         render_graph(conn, mfa)
 
