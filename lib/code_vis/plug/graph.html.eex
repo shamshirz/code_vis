@@ -3,9 +3,15 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <script src="//d3js.org/d3.v5.min.js"></script>
-    <script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
-    <script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
+
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style type="text/css">
+      #graph {
+        width: 2000px;
+        height: 800px;
+        border: 1px solid lightgray;
+      }
+    </style>
 
     <% {_m, function, arity} = @mfa %>
     <title><%= "#{Atom.to_string(function)}/#{arity}" %> Graph</title>
@@ -16,14 +22,50 @@
       <h1><%= Display.format_mfa(@mfa) %></h1>
       <input type="hidden" id="data-input" value='<%= @dot_string %>' />
 
-      <div id="graph" style="text-align: center; border-style: solid;"></div>
+      <div id="graph"></div>
     </main>
-    <script>
-      var dotString = document.getElementById("data-input").value
 
-      d3.select("#graph")
-          .graphviz()
-          .renderDot(dotString);
+    <script>
+      var DOTstring = document.getElementById("data-input").value
+      var parsedData = vis.parseDOTNetwork(DOTstring);
+
+      var data = {
+        nodes: parsedData.nodes,
+        edges: parsedData.edges
+      }
+
+      var options = {
+        layout:{
+          hierarchical: {
+            enabled: true,
+            levelSeparation: 100,
+            nodeSpacing: 100,
+            // treeSpacing: 200,
+            blockShifting: true,
+            edgeMinimization: true,
+            parentCentralization: true,
+            direction: 'UD',        // UD, DU, LR, RL
+            sortMethod: 'directed',  // hubsize, directed
+            shakeTowards: 'roots'  // roots, leaves
+          }
+        },
+        physics: {
+          hierarchicalRepulsion: {
+            nodeDistance: 120,
+            avoidOverlap: 0.5, // Higher = more repulsion
+          },
+        },
+        nodes: {
+          shape: "box",
+          font: { face: "monospace", align: "left" },
+        }
+      }
+
+      var container = document.getElementById("graph");
+
+      // create a network
+      var network = new vis.Network(container, data, options);
+
     </script>
   </body>
 </html>
