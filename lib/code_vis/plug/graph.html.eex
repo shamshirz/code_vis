@@ -20,6 +20,10 @@
   <body>
     <main>
       <h1><%= Display.format_mfa(@mfa) %></h1>
+
+      <h4>Toggle between hierarchical & clustered View: </h4>
+      <input type="button" onclick="toggleView()" value="change the view style" />
+
       <input type="hidden" id="data-input" value='<%= @dot_string %>' />
 
       <div id="graph"></div>
@@ -64,7 +68,69 @@
       var container = document.getElementById("graph");
 
       // create a network
+      var isHeirarchyView = true
       var network = new vis.Network(container, data, options);
+
+      // View options - functions to switch between the two
+      function hierarchicalView() {
+        var heriarchicalOptions = {
+          layout:{
+            hierarchical: {
+              enabled: true,
+              levelSeparation: 100,
+              nodeSpacing: 100,
+              // treeSpacing: 200,
+              blockShifting: true,
+              edgeMinimization: true,
+              parentCentralization: true,
+              direction: 'UD',        // UD, DU, LR, RL
+              sortMethod: 'directed',  // hubsize, directed
+              shakeTowards: 'roots'  // roots, leaves
+            }
+          },
+          physics: {
+            hierarchicalRepulsion: {
+              nodeDistance: 120,
+              avoidOverlap: 0.5, // Higher = more repulsion
+            },
+          },
+          nodes: {
+            shape: "box",
+            font: { face: "monospace", align: "left" },
+          }
+        }
+
+        network.setOptions(heriarchicalOptions);
+      }
+
+      function clusteredView() {
+        var clusteredOptions = {
+          layout: { hierarchical: false },
+          physics: {
+            barnesHut: {
+              avoidOverlap: 0.1
+            }
+          },
+          nodes: {
+            shape: "box",
+            font: { face: "monospace", align: "left" },
+          }
+        }
+
+        network.setOptions(clusteredOptions);
+      }
+
+
+      function toggleView() {
+        if (isHeirarchyView) {
+          clusteredView()
+        } else {
+          hierarchicalView()
+        }
+
+        isHeirarchyView = !isHeirarchyView
+      }
+
 
     </script>
   </body>
