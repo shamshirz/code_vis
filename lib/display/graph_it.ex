@@ -79,12 +79,13 @@ defmodule Display.GraphIt do
           nil | any()
         ) ::
           {Graphvix.Graph.t(), vertex_id :: any()}
-  defp add_node_and_edge_to_parent(graph, mfa, nil) do
-    Graph.add_vertex(graph, Display.format_mfa(mfa))
+  defp add_node_and_edge_to_parent(graph, {m, _f, _a} = mfa, nil) do
+    Graph.add_vertex(graph, Display.format_mfa(mfa), group: Atom.to_string(m))
   end
 
-  defp add_node_and_edge_to_parent(graph, {_, _, _} = mfa, parent_vertex_id) do
-    {updated_graph, current_vertex_id} = Graph.add_vertex(graph, Display.format_mfa(mfa))
+  defp add_node_and_edge_to_parent(graph, {m, _, _} = mfa, parent_vertex_id) do
+    {updated_graph, current_vertex_id} =
+      Graph.add_vertex(graph, Display.format_mfa(mfa), group: Atom.to_string(m))
 
     {updated_graph_2, _edge_id} =
       Graph.add_edge(
