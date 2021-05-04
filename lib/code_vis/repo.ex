@@ -61,5 +61,5 @@ defmodule CodeVis.Repo do
   end
 
   @spec all :: [{caller :: mfa(), target :: mfa()}]
-  defp all(), do: :ets.tab2list(@table_name)
+  def all(), do: :ets.tab2list(@table_name)
 end
