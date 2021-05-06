@@ -4,7 +4,7 @@ defmodule CodeVis.MixProject do
   def project do
     [
       app: :code_vis,
-      version: "0.1.1",
+      version: "1.2.0",
       elixir: "~> 1.11",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -29,6 +29,7 @@ defmodule CodeVis.MixProject do
   defp deps do
     [
       {:graphvix, "~> 1.0.0"},
+      {:nimble_csv, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:stream_data, "~> 0.1", only: [:dev, :test]}
     ]

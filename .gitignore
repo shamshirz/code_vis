@@ -3,6 +3,7 @@
 /_graphs
 /deps
 *.beam
+*.csv
 .elixir_ls/
 .DS_Store
 test_project/_build
