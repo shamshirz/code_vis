@@ -33,7 +33,7 @@ defmodule Mix.Tasks.CodeVis.ToCsv do
     end
 
     Repo.start()
-    Mix.Task.rerun("compile.elixir", ["--force", "--tracer", "CodeVis.FunctionTracer"])
+    Mix.Task.rerun("compile", ["--force", "--tracer", "CodeVis.FunctionTracer"])
 
     IO.puts("Trace complete. Generating CSV…")
 
@@ -43,7 +43,14 @@ defmodule Mix.Tasks.CodeVis.ToCsv do
 
   @spec write_csv([{caller :: mfa(), target :: mfa()}]) :: :ok
   defp write_csv(data) do
-    formatted = Enum.map(data, &format_data/1)
+    user_modules = CodeVis.ProjectAnalysis.user_modules()
+
+    formatted =
+      data
+      |> Enum.filter(fn {{caller_m, _, _}, {target_m, _, _}} ->
+        caller_m in user_modules and target_m in user_modules
+      end)
+      |> Enum.map(&format_data/1)
 
     header = [
       "Caller ID",

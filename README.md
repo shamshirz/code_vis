@@ -20,6 +20,9 @@ end
 > mix deps.get
 > mix code_vis.server
 # Open localhost:1337
+
+# Want to export all function calls to a CSV to analyze elsewhere?
+> mix code_vis.to_csv
 ```
 
 ## Development Setup
