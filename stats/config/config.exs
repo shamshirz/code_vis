@@ -14,6 +14,11 @@ config :stats, Stats.Repo,
   migration_primary_key: [name: :id, type: :binary_id],
   migration_timestamps: [type: :utc_datetime_usec]
 
+config :stats, :generators,
+  migration: true,
+  binary_id: true,
+  sample_binary_id: "11111111-1111-1111-1111-111111111111"
+
 # Configures the endpoint
 config :stats, StatsWeb.Endpoint,
   url: [host: "localhost"],
